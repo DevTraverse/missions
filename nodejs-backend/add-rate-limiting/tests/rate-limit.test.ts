@@ -190,13 +190,13 @@ describe('12-15: X-RateLimit-Remaining header', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 16-17  Window sliding — requests succeed again after the window expires
+// 16-17  Window expiry — counter resets and requests succeed after the fixed window expires
 //
 // Uses a short window (5 req / 1 s) so the test doesn't have to wait 60 s.
 // beforeEach flushes Redis so each test gets a clean slate.
 // ---------------------------------------------------------------------------
 
-describe('16-17: Window sliding', () => {
+describe('16-17: Window expiry', () => {
   let app: App;
   const IP_16 = '10.0.0.5';
   const IP_17 = '10.0.0.6';
