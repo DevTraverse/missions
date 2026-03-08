@@ -23,7 +23,8 @@ export default async function searchRoutes(
     //     parsed by Fastify because trustProxy is enabled in app.ts)
     //   - Redis key pattern: `rate_limit:${ip}` with a TTL of rateLimitWindow seconds
     //   - Algorithm: fixed-window counter using Redis INCR + EXPIRE
-    //   - On every allowed request: set the X-RateLimit-Remaining response header
+    //   - On every allowed request (200): set the X-RateLimit-Remaining response header
+    //   - On rate-limited requests (429): do NOT set X-RateLimit-Remaining
     //   - When the limit is exceeded: reply with status 429, a Retry-After header
     //     (value = remaining TTL in seconds), and body { error: 'Too Many Requests' }
     //

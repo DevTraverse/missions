@@ -14,8 +14,8 @@ export async function buildApp(opts: AppOptions = {}) {
     trustProxy: true,
   });
 
-  app.register(redisPlugin);
-  app.register(searchRoutes, {
+  await app.register(redisPlugin);
+  await app.register(searchRoutes, {
     rateLimitMax: opts.rateLimitMax ?? 100,
     rateLimitWindow: opts.rateLimitWindow ?? 60,
   });
