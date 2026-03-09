@@ -1,0 +1,55 @@
+name: Evaluate Submission
+
+on:
+  workflow_dispatch:
+    inputs:
+      submission_id:
+        description: Submission ID
+        required: true
+      mission_dir:
+        description: Mission directory (e.g. nodejs-backend/add-rate-limiting)
+        required: true
+      base_commit:
+        description: Base commit SHA to apply diff against
+        required: true
+      diff_url:
+        description: Pre-signed R2 URL to download the diff
+        required: true
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout base commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.base_commit }}
+
+      - name: Download and apply diff
+        run: |
+          curl -fsSL "${{ inputs.diff_url }}" -o submission.diff
+          git apply submission.diff
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ${{ inputs.mission_dir }}/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ${{ inputs.mission_dir }}
+
+      - name: Run tests
+        id: tests
+        run: npm test
+        working-directory: ${{ inputs.mission_dir }}
+
+      - name: Report result
+        if: always()
+        run: |
+          echo "submission_id=${{ inputs.submission_id }}"
+          echo "conclusion=${{ steps.tests.conclusion }}"
